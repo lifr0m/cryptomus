@@ -7,12 +7,13 @@ use serde::de::DeserializeOwned;
 use serde::Deserialize;
 use url::Url;
 
+#[derive(Clone)]
 pub struct Client {
     client: reqwest::Client,
     config: Config,
 }
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct Config {
     pub merchant_id: String,
     pub api_key: String,

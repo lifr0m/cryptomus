@@ -330,7 +330,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio",
-    "url",
+ "url",
 ]
 
 [[package]]
@@ -1848,7 +1848,7 @@ dependencies = [
  "form_urlencoded",
  "idna",
  "percent-encoding",
-    "serde",
+ "serde",
 ]
 
 [[package]]
