@@ -51,7 +51,6 @@ struct PaymentUpdateData {
 impl Client {
     pub async fn serve_webhook<C, CFut>(
         &self,
-        host: &str,
         client_ip: IpAddr,
         callback: C,
     ) -> std::io::Result<()>
@@ -64,7 +63,7 @@ impl Client {
         let app = Router::new()
             .route("/", post(handle_payment_update))
             .with_state(shared_state);
-        let listener = tokio::net::TcpListener::bind((host, 80)).await?;
+        let listener = tokio::net::TcpListener::bind("0.0.0.0:80").await?;
         axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>()).await
     }
 }
