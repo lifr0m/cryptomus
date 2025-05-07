@@ -10,8 +10,8 @@ use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct PaymentResult {
-    order_id: String,
-    data: PaymentResultData,
+    pub order_id: String,
+    pub data: PaymentResultData,
 }
 
 #[derive(Debug)]
