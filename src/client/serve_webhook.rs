@@ -65,7 +65,12 @@ where
     if state.client_ip != addr.ip() {
         return StatusCode::FORBIDDEN;
     }
-    if payload.sign != compute_signature(&state.api_key, &payload.data) {
+    let signature = compute_signature(
+        &state.api_key,
+        serde_json::to_string(&payload.data).unwrap()
+            .replace("/", "\\/"),
+    );
+    if payload.sign != signature {
         return StatusCode::UNAUTHORIZED;
     }
     let payload = match serde_json::from_value::<PaymentUpdateData>(payload.data) {

@@ -27,9 +27,13 @@ impl Client {
     where
         T: DeserializeOwned,
     {
+        let signature = compute_signature(
+            &self.config.api_key,
+            serde_json::to_vec(payload).unwrap(),
+        );
         self.client.post(format!("https://api.cryptomus.com{endpoint}"))
             .header("merchant", &self.config.merchant_id)
-            .header("sign", compute_signature(&self.config.api_key, payload))
+            .header("sign", signature)
             .json(payload)
             .send()
             .await?
@@ -39,9 +43,8 @@ impl Client {
     }
 }
 
-fn compute_signature(api_key: &str, payload: &serde_json::Value) -> String {
-    let payload = serde_json::to_vec(payload).unwrap();
-    let prepared = format!("{}{}", BASE64_STANDARD.encode(payload), api_key);
-    let signature = md5(prepared);
+fn compute_signature(api_key: &str, payload: impl AsRef<[u8]>) -> String {
+    let data = format!("{}{}", BASE64_STANDARD.encode(payload), api_key);
+    let signature = md5(data);
     hex::encode(signature)
 }
