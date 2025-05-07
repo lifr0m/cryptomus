@@ -4,7 +4,6 @@ mod serve_webhook;
 use crate::crypto::md5;
 use base64::prelude::{Engine, BASE64_STANDARD};
 use serde::de::DeserializeOwned;
-use serde::Serialize;
 
 pub struct Client {
     client: reqwest::Client,
