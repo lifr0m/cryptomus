@@ -42,7 +42,7 @@ impl Client {
             .send()
             .await?
             .error_for_status()?
-            .json()
+            .json::<T>()
             .await
     }
 }
