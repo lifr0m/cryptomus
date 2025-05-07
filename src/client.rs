@@ -5,6 +5,7 @@ use crate::crypto::md5;
 use base64::prelude::{Engine, BASE64_STANDARD};
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
+use url::Url;
 
 pub struct Client {
     client: reqwest::Client,
@@ -15,7 +16,7 @@ pub struct Client {
 pub struct Config {
     pub merchant_id: String,
     pub api_key: String,
-    pub callback_url: String,
+    pub callback_url: Url,
 }
 
 impl Client {
