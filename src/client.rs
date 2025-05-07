@@ -1,5 +1,5 @@
 mod create_invoice;
-mod serve_webhook;
+pub mod serve_webhook;
 
 use crate::crypto::md5;
 use base64::prelude::{Engine, BASE64_STANDARD};

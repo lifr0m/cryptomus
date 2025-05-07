@@ -9,14 +9,17 @@ use std::net::{IpAddr, SocketAddr};
 use std::sync::Arc;
 
 #[derive(Debug)]
-pub enum PaymentResult {
+pub struct PaymentResult {
+    order_id: String,
+    data: PaymentResultData,
+}
+
+#[derive(Debug)]
+pub enum PaymentResultData {
     Success {
-        order_id: String,
         amount: Decimal,
     },
-    Failure {
-        order_id: String,
-    },
+    Failure,
 }
 
 struct AppState<C, CFut>
@@ -96,15 +99,16 @@ where
     if !payload.is_final {
         return StatusCode::NO_CONTENT;
     }
-    let result = if payload.status == "paid" || payload.status == "paid_over" {
-        PaymentResult::Success {
-            order_id: payload.order_id,
+    let data = if payload.status == "paid" || payload.status == "paid_over" {
+        PaymentResultData::Success {
             amount: payload.payment_amount_usd,
         }
     } else {
-        PaymentResult::Failure {
-            order_id: payload.order_id
-        }
+        PaymentResultData::Failure
+    };
+    let result = PaymentResult {
+        order_id: payload.order_id,
+        data,
     };
     (state.callback)(result).await;
     StatusCode::NO_CONTENT
