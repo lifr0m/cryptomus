@@ -3,13 +3,25 @@ use axum::extract::{ConnectInfo, State};
 use axum::http::StatusCode;
 use axum::routing::post;
 use axum::{Json, Router};
+use rust_decimal::Decimal;
 use serde::Deserialize;
 use std::net::{IpAddr, SocketAddr};
 use std::sync::Arc;
 
+#[derive(Debug)]
+pub enum PaymentResult {
+    Success {
+        order_id: String,
+        amount: Decimal,
+    },
+    Failure {
+        order_id: String,
+    },
+}
+
 struct AppState<C, CFut>
 where
-    C: Fn(String, bool) -> CFut,
+    C: Fn(PaymentResult) -> CFut,
     CFut: Future<Output = ()>,
 {
     api_key: String,
@@ -28,6 +40,7 @@ struct PaymentUpdate {
 struct PaymentUpdateData {
     r#type: String,
     order_id: String,
+    payment_amount_usd: Decimal,
     is_final: bool,
     status: String,
 }
@@ -40,7 +53,7 @@ impl Client {
         callback: C,
     ) -> std::io::Result<()>
     where
-        C: Fn(String, bool) -> CFut + Send + Sync + 'static,
+        C: Fn(PaymentResult) -> CFut + Send + Sync + 'static,
         CFut: Future<Output = ()> + Send + 'static,
     {
         let api_key = self.config.api_key.clone();
@@ -59,7 +72,7 @@ async fn handle_payment_update<C, CFut>(
     Json(payload): Json<PaymentUpdate>,
 ) -> StatusCode
 where
-    C: Fn(String, bool) -> CFut,
+    C: Fn(PaymentResult) -> CFut,
     CFut: Future<Output = ()>,
 {
     if state.client_ip != addr.ip() {
@@ -83,10 +96,16 @@ where
     if !payload.is_final {
         return StatusCode::NO_CONTENT;
     }
-    if payload.status == "paid" || payload.status == "paid_over" {
-        (state.callback)(payload.order_id, true).await;
+    let result = if payload.status == "paid" || payload.status == "paid_over" {
+        PaymentResult::Success {
+            order_id: payload.order_id,
+            amount: payload.payment_amount_usd,
+        }
     } else {
-        (state.callback)(payload.order_id, false).await;
-    }
+        PaymentResult::Failure {
+            order_id: payload.order_id
+        }
+    };
+    (state.callback)(result).await;
     StatusCode::NO_CONTENT
 }
