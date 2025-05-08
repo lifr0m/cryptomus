@@ -61,7 +61,7 @@ impl Client {
         let api_key = self.config.api_key.clone();
         let shared_state = Arc::new(AppState { api_key, client_ip, callback });
         let app = Router::new()
-            .route("/", post(handle_payment_update))
+            .route("/cryptomus", post(handle_payment_update))
             .with_state(shared_state);
         let listener = tokio::net::TcpListener::bind("0.0.0.0:80").await?;
         axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>()).await
