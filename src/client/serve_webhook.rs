@@ -84,15 +84,15 @@ where
         Err(_) => return StatusCode::BAD_REQUEST,
     };
     if payload.r#type != "payment" {
-        return StatusCode::NO_CONTENT;
+        return StatusCode::OK;
     }
     if !payload.is_final {
-        return StatusCode::NO_CONTENT;
+        return StatusCode::OK;
     }
     let result = PaymentResult {
         order_id: payload.order_id,
         success: payload.status == "paid" || payload.status == "paid_over",
     };
     (state.callback)(result).await;
-    StatusCode::NO_CONTENT
+    StatusCode::OK
 }
