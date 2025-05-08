@@ -3,7 +3,6 @@ use axum::extract::{ConnectInfo, State};
 use axum::http::StatusCode;
 use axum::routing::post;
 use axum::{Json, Router};
-use rust_decimal::Decimal;
 use serde::Deserialize;
 use std::net::{IpAddr, SocketAddr};
 use std::sync::Arc;
@@ -12,15 +11,7 @@ use uuid::Uuid;
 #[derive(Debug)]
 pub struct PaymentResult {
     pub order_id: Uuid,
-    pub data: PaymentResultData,
-}
-
-#[derive(Debug)]
-pub enum PaymentResultData {
-    Success {
-        amount: Decimal,
-    },
-    Failure,
+    pub success: bool,
 }
 
 struct AppState<C, CFut>
@@ -44,7 +35,6 @@ struct PaymentUpdate {
 struct PaymentUpdateData {
     r#type: String,
     order_id: Uuid,
-    payment_amount_usd: Decimal,
     is_final: bool,
     status: String,
 }
@@ -99,16 +89,9 @@ where
     if !payload.is_final {
         return StatusCode::NO_CONTENT;
     }
-    let data = if payload.status == "paid" || payload.status == "paid_over" {
-        PaymentResultData::Success {
-            amount: payload.payment_amount_usd,
-        }
-    } else {
-        PaymentResultData::Failure
-    };
     let result = PaymentResult {
         order_id: payload.order_id,
-        data,
+        success: payload.status == "paid" || payload.status == "paid_over",
     };
     (state.callback)(result).await;
     StatusCode::NO_CONTENT
