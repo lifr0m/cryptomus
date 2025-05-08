@@ -2,6 +2,7 @@ use super::Client;
 use rust_decimal::Decimal;
 use serde::Deserialize;
 use serde_json::json;
+use uuid::Uuid;
 
 #[derive(Deserialize)]
 struct CreateInvoice {
@@ -16,7 +17,7 @@ struct CreateInvoiceResult {
 impl Client {
     pub async fn create_invoice(
         &self,
-        order_id: &str,
+        order_id: Uuid,
         amount: Decimal,
         currencies: &[impl AsRef<str>],
     ) -> reqwest::Result<String> {

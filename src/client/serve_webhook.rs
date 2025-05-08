@@ -7,10 +7,11 @@ use rust_decimal::Decimal;
 use serde::Deserialize;
 use std::net::{IpAddr, SocketAddr};
 use std::sync::Arc;
+use uuid::Uuid;
 
 #[derive(Debug)]
 pub struct PaymentResult {
-    pub order_id: String,
+    pub order_id: Uuid,
     pub data: PaymentResultData,
 }
 
@@ -42,7 +43,7 @@ struct PaymentUpdate {
 #[derive(Deserialize)]
 struct PaymentUpdateData {
     r#type: String,
-    order_id: String,
+    order_id: Uuid,
     payment_amount_usd: Decimal,
     is_final: bool,
     status: String,
