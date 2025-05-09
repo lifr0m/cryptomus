@@ -19,12 +19,12 @@ impl Client {
         &self,
         order_id: Uuid,
         usd_amount: Decimal,
-        currencies: &[String],
+        currencies: &[impl AsRef<str>],
         callback_url: &str,
     ) -> reqwest::Result<String> {
         let currencies = currencies.iter()
             .map(|currency| json!({
-                "currency": currency
+                "currency": currency.as_ref()
             }))
             .collect::<Vec<_>>();
         let payload = json!({
