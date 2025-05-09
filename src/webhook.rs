@@ -56,9 +56,9 @@ pub async fn handle_payment_update(
     if !payload.is_final {
         return (StatusCode::OK, None);
     }
-    let result = PaymentResult {
+    let payment_result = PaymentResult {
         order_id: payload.order_id,
         success: payload.status == "paid" || payload.status == "paid_over",
     };
-    (StatusCode::OK, Some(result))
+    (StatusCode::OK, Some(payment_result))
 }
