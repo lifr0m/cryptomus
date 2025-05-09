@@ -2,7 +2,6 @@ use crate::crypto::compute_signature;
 use axum::http::StatusCode;
 use serde::Deserialize;
 use std::net::{IpAddr, SocketAddr};
-use std::sync::Arc;
 use uuid::Uuid;
 
 #[derive(Debug)]
@@ -32,7 +31,7 @@ struct PaymentUpdateData {
 }
 
 pub async fn handle_payment_update(
-    state: Arc<AppState>,
+    state: &AppState,
     addr: SocketAddr,
     payload: PaymentUpdate,
 ) -> (StatusCode, Option<PaymentResult>) {
