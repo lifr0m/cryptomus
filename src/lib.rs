@@ -1,5 +1,5 @@
 mod crypto;
 mod client;
+pub mod webhook;
 
-pub use client::serve_webhook::PaymentResult;
-pub use client::{Client, Config};
+pub use client::Client;

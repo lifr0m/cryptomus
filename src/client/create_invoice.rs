@@ -2,6 +2,7 @@ use super::Client;
 use rust_decimal::Decimal;
 use serde::Deserialize;
 use serde_json::json;
+use url::Url;
 use uuid::Uuid;
 
 #[derive(Deserialize)]
@@ -18,8 +19,9 @@ impl Client {
     pub async fn create_invoice(
         &self,
         order_id: Uuid,
-        amount: Decimal,
+        usd_amount: Decimal,
         currencies: &[impl AsRef<str>],
+        callback_url: Url,
     ) -> reqwest::Result<String> {
         let currencies = currencies.iter()
             .map(|currency| json!({
@@ -27,10 +29,10 @@ impl Client {
             }))
             .collect::<Vec<_>>();
         let payload = json!({
-            "amount": amount,
+            "amount": usd_amount,
             "currency": "USD",
             "order_id": order_id,
-            "url_callback": self.config.callback_url,
+            "url_callback": callback_url,
             "currencies": currencies,
         });
         Ok(self.request::<CreateInvoice>("/v1/payment", &payload)
