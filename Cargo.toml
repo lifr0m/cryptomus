@@ -15,7 +15,6 @@ rust_decimal = "1"
 hex = "0.4"
 base64 = "0.22"
 md-5 = "0.10"
-url = { version = "2", features = ["serde"] }
 uuid = { version = "1", features = ["serde"] }
 
 [dev-dependencies]

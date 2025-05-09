@@ -2,7 +2,6 @@ use super::Client;
 use rust_decimal::Decimal;
 use serde::Deserialize;
 use serde_json::json;
-use url::Url;
 use uuid::Uuid;
 
 #[derive(Deserialize)]
@@ -20,12 +19,12 @@ impl Client {
         &self,
         order_id: Uuid,
         usd_amount: Decimal,
-        currencies: &[impl AsRef<str>],
-        callback_url: Url,
+        currencies: &[String],
+        callback_url: &str,
     ) -> reqwest::Result<String> {
         let currencies = currencies.iter()
             .map(|currency| json!({
-                "currency": currency.as_ref()
+                "currency": currency
             }))
             .collect::<Vec<_>>();
         let payload = json!({
